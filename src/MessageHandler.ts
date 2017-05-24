@@ -1,4 +1,5 @@
-import { NaturalLanguage } from './NaturalLanguage';
+import { NaturalLanguageHandler } from './NaturalLanguageHandler';
+import { CommandHandler } from './CommandHandler';
 import { Command } from './Command';
 
 const _ = require('lodash');
@@ -17,26 +18,13 @@ export class MessageHandler {
         }
         
         if (_.startsWith(message, this.commandCharacter)) {
-            console.log(`command: ${chatInstance.author.username}: ${message}`);
+            console.log(`command: ${chatInstance.author.username} uses "${message}"`);
             const text =  _.trimStart(message, this.commandCharacter);
-            const command = new Command(text);
-
-            if (command.Name === 'tell') {
-                if (chatInstance.author.username === 'Sylkis') {
-                    const tell = new Command(command.Args)
-                    const target = this.getMessageTarget(tell.Name);
-                    if (tell.Args) {
-                        chatInstance.channel.send(`${target}: ${tell.Args}`);
-                    }
-                } else {
-                    chatInstance.channel.send('no');
-                }
-            } else {
-                chatInstance.channel.send(`I don't know how to '${command}'`);
-            }
+            let commandHandler = new CommandHandler(this.discordClient);
+            commandHandler.handleRequest(chatInstance, text);
         } else {
-            let naturalLanguage = new NaturalLanguage();
-            naturalLanguage.handleRequest(message).then((response) => {
+            let naturalLanguageHandler = new NaturalLanguageHandler();
+            naturalLanguageHandler.handleRequest(message).then((response) => {
                 chatInstance.channel.send(response);
             });
         }

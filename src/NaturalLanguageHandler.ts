@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 import { AppConfig } from './../AppConfig';
 
-export class NaturalLanguage {
+export class NaturalLanguageHandler {
     witClient:any;
     responseMap: { [index: string]: string; } = { 
         'temperature_get': 'temperature? what?',
