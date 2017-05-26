@@ -1,61 +1,32 @@
-const { Wit } = require('node-wit');
+const apiai = require('apiai');
+const UuidV4 = require('uuid/v4');
 const _ = require('lodash');
 
 import { AppConfig } from './../AppConfig';
 
 export class NaturalLanguageHandler {
-    witClient:any;
-    responseMap: { [index: string]: string; } = { 
-        'temperature_get': 'temperature? what?',
-        'positive': '＼(*´▽`*)／',
-        'negative': '｡･ﾟﾟ･(≧д≦)･ﾟﾟ･｡',
-        'dance': '♫ヽ(゜∇゜ヽ)♪♬(ノ゜∇゜)ノ♩♪',
-    };
+    aiClient:any;
+    uuid: string;
 
     constructor() {
-        this.witClient = new Wit({
-            accessToken: new AppConfig().WIT_TOKEN,
-        })
+        this.aiClient = apiai(new AppConfig().APIAI_TOKEN);
+        this.uuid = UuidV4();
     }
 
-    handleRequest(message:string):Promise<string> {
-        const promise = this.witClient.message(message, {}).then((data:any) => {
-            let response: string = ':3 ?';
-            console.log(data);
-            const entities = data.entities;
-            if (!_.isEmpty(entities)) {
-                if (entities.intent) {
-                    response = this.intentHandler(entities.intent);
-                } else if (entities.greetings) {
-                    response = this.greetingHandler(entities.greetings);
-                } else if (entities.thanks) {
-                    response = this.thanksHandler(entities.thanks);
-                }
-            }
+    handleRequest(chatInstance:any, message:string) {
+        console.log(`NaturalLanguage: ${message}`);
+        var request = this.aiClient.textRequest(message, {
+            sessionId: this.uuid
+        });
 
-            // don't understand the message, return default response
-            return response;
-        })
+        request.on('response', (response:any) => {
+            chatInstance.channel.send(response.result.fulfillment.speech);
+        });
 
-        return promise;
-    }
+        request.on('error', (error:any) => {
+            console.log(error);
+        });
 
-    intentHandler(intents:any) {
-        const intent:string = intents[0].value;
-        if (intent in this.responseMap) {
-            return this.responseMap[intent];
-        }
-        return `I don't have a response for ${intent}...`;
-    }
-
-    greetingHandler(greetings:any) {
-        console.log(greetings);
-        const nothing = 1;
-        return 'hi';
-    }
-
-    thanksHandler(thanks:any) {
-        console.log(thanks);
-        return this.responseMap['positive'];
+        request.end();
     }
 }

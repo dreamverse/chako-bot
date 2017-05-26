@@ -24,9 +24,7 @@ export class MessageHandler {
             commandHandler.handleRequest(chatInstance, text);
         } else {
             let naturalLanguageHandler = new NaturalLanguageHandler();
-            naturalLanguageHandler.handleRequest(message).then((response) => {
-                chatInstance.channel.send(response);
-            });
+            naturalLanguageHandler.handleRequest(chatInstance, message);
         }
     }
 
