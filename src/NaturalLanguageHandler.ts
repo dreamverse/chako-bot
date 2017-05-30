@@ -25,10 +25,11 @@ export class NaturalLanguageHandler {
         });
 
         request.on('response', (response:any) => {
-            if (!_.startsWith(response.result.action, 'smalltalk') && !_.startsWith(response.result.action, 'input.unknown')) {
+            if (_.startsWith(response.result.action, 'smalltalk') && !_.startsWith(response.result.action, 'input.unknown')) {
+                chatInstance.channel.send(response.result.fulfillment.speech);
+            } else {
                 this.commandHandler.handleRequest(chatInstance, response.result);
             }
-            chatInstance.channel.send(response.result.fulfillment.speech);
         });
 
         request.on('error', (error:any) => {

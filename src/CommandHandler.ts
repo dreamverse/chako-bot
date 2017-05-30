@@ -5,15 +5,36 @@ import { AppConfig } from './../AppConfig';
 export class CommandHandler {
     discordClient: any;
     handlers: IFunctionMap = {
-        'roleManagement.add': (chatInstance, params) => {
-            console.log('add to role: ' + params.role);
+        'roleManagement.add': (chatInstance, result) => {
+            const params = result.parameters;
             const roleName = params.role;
             const guildMember = chatInstance.member;
             const role = chatInstance.guild.roles.find('name', roleName);
             if (role) {
-                guildMember.addRole(role);
+                guildMember.addRole(role).then(() => {
+                    chatInstance.channel.send(result.fulfillment.speech);
+                }).catch((error: any) => {
+                    console.log(error);
+                    chatInstance.channel.send(`I can't, because: ${error.message}`);
+                });
             } else {
-                chatInstance.channel.send(`what role is ${roleName}?`);
+                chatInstance.channel.send(`I can't`);
+            }
+        },
+        'roleManagement.remove': (chatInstance, result) => {
+            const params = result.parameters;
+            const roleName = params.role;
+            const guildMember = chatInstance.member;
+            const role = chatInstance.guild.roles.find('name', roleName);
+            if (role) {
+                guildMember.removeRole(role).then(() => {
+                    chatInstance.channel.send(result.fulfillment.speech);
+                }).catch((error: any) => {
+                    console.log(error);
+                    chatInstance.channel.send(`I can't, because: ${error.message}`);
+                });
+            } else {
+                chatInstance.channel.send(`I can't`);
             }
         }
     }
@@ -28,9 +49,7 @@ export class CommandHandler {
         if (_.startsWith(action, 'smalltalk')) {
             return;
         } else if (this.handlers[action]) {
-            this.handlers[action](chatInstance, result.parameters);
-        } else {
-            chatInstance.channel.send('???');
+            this.handlers[action](chatInstance, result);
         }
     }
 
