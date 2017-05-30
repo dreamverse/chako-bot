@@ -12,7 +12,8 @@
   "license": "",
   "dependencies": {
     "lodash": "^4.17.4",
-    "node-wit": "^4.2.0"
+    "apiai": "^4.0.2",
+    "discord.js": "^11.1.0",
   },
   "devDependencies": {
     "@types/node": "^7.0.18",
