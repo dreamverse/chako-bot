@@ -1,3 +1,5 @@
-%~d1
-cd "%~p1"
-npm start
+call npm install forever -g
+call npm install typescript@latest -g
+
+call tsc -p tsconfig.json
+forever -f build\src\app.js
