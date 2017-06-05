@@ -28,7 +28,12 @@ export class NaturalLanguageHandler {
             if (_.startsWith(response.result.action, 'smalltalk') || _.startsWith(response.result.action, 'input.unknown')) {
                 chatInstance.channel.send(response.result.fulfillment.speech);
             } else {
-                this.commandHandler.handleRequest(chatInstance, response.result);
+                this.commandHandler.handleRequest(chatInstance, response.result).then((successMessage: string) => {
+                    chatInstance.channel.send(successMessage);
+                }).catch((errorMessage: string) => {
+                    console.log(errorMessage);
+                    chatInstance.channel.send(response.result.fulfillment.speech);
+                });
             }
         });
 

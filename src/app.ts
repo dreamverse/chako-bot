@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-import { MessageHandler } from './MessageHandler';
+import { NaturalLanguageHandler } from './NaturalLanguageHandler';
 import { AppConfig } from './../AppConfig';
 
 const config = new AppConfig();
@@ -19,8 +19,12 @@ client.on('message', (instance: any) => {
             message = message.replace(`<@${config.BOT_ID}> `, '');
         }
 
-        const handler = new MessageHandler(client);
-        handler.handleRequest(instance, message);
+        if (message === '') {
+            instance.channel.send('(｡･ω･｡) ?');
+        }
+        
+        let naturalLanguageHandler = new NaturalLanguageHandler(client);
+        naturalLanguageHandler.handleRequest(instance, message);
     }
 });
 

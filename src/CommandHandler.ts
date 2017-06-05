@@ -5,37 +5,44 @@ import { AppConfig } from './../AppConfig';
 export class CommandHandler {
     discordClient: any;
     handlers: IFunctionMap = {
-        'roleManagement.add': (chatInstance, result) => {
+        'roleManagement.add': (chatInstance, result): Promise<string> => {
             const params = result.parameters;
             const roleName = params.role;
             const guildMember = chatInstance.member;
             const role = chatInstance.guild.roles.find('name', roleName);
-            if (role) {
-                guildMember.addRole(role).then(() => {
-                    chatInstance.channel.send(result.fulfillment.speech);
-                }).catch((error: any) => {
-                    console.log(error);
-                    chatInstance.channel.send(`I can't, because: ${error.message}`);
-                });
-            } else {
-                chatInstance.channel.send(`I can't`);
-            }
+
+            return new Promise((resolve, reject) => {
+                if (role) {
+                    resolve(guildMember.addRole(role).then(() => {
+                        return result.fulfillment.speech;
+                    }).catch((error: any) => {
+                        console.log(error);
+                        return `I can't, because: ${error.message}`;
+                    }));
+                } else {
+                    reject('I can\'t');
+                }
+            });
         },
-        'roleManagement.remove': (chatInstance, result) => {
+        'roleManagement.remove': (chatInstance, result): Promise<string> => {
             const params = result.parameters;
             const roleName = params.role;
             const guildMember = chatInstance.member;
             const role = chatInstance.guild.roles.find('name', roleName);
-            if (role) {
-                guildMember.removeRole(role).then(() => {
-                    chatInstance.channel.send(result.fulfillment.speech);
-                }).catch((error: any) => {
-                    console.log(error);
-                    chatInstance.channel.send(`I can't, because: ${error.message}`);
-                });
-            } else {
-                chatInstance.channel.send(`I can't`);
-            }
+
+
+            return new Promise((resolve, reject) => {
+                if (role) {
+                    resolve(guildMember.removeRole(role).then(() => {
+                        return result.fulfillment.speech;
+                    }).catch((error: any) => {
+                        console.log(error);
+                        return `I can't, because: ${error.message}`;
+                    }));
+                } else {
+                    reject('I can\'t');
+                }
+            });
         }
     }
 
@@ -43,14 +50,16 @@ export class CommandHandler {
         this.discordClient = discordClient;
     }
 
-    handleRequest(chatInstance:any, result:any):void {
+    handleRequest(chatInstance:any, result:any):Promise<string> {
         const action = result.action;
 
-        if (_.startsWith(action, 'smalltalk')) {
-            return;
-        } else if (this.handlers[action]) {
-            this.handlers[action](chatInstance, result);
-        }
+        return new Promise((resolve, reject) => {
+            if (this.handlers[action]) {
+                resolve(this.handlers[action](chatInstance, result));
+            } else {
+                reject(`Unknown action: ${action}`);
+            }
+        });
     }
 
     getMessageTarget(name: string):string {
@@ -64,5 +73,5 @@ export class CommandHandler {
 }
 
 interface IFunctionMap {
-    [key: string]: (chatInstance:any, parameters:any) => void;
+    [key: string]: (chatInstance:any, parameters:any) => Promise<string>;
 }
