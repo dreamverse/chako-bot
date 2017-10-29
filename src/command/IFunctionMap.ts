@@ -1,3 +1,3 @@
 export interface IFunctionMap {
-    [key: string]: (chatInstance:any, parameters:any) => Promise<string>;
+    [key: string]: (responseParams:any, chatInstance?:any) => Promise<string>;
 }

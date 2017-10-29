@@ -3,3 +3,4 @@ node_modules/
 *.map
 AppConfig.ts
 *.log
+.node-persist/
