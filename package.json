@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^7.0.18",
+    "node-persist": "^2.1.0",
     "nodemon": "^1.11.0",
     "ts-node": "^3.0.4",
     "tslint": "^5.2.0",

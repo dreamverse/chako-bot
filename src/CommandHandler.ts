@@ -8,11 +8,11 @@ export class CommandHandler {
     discordClient: any;
     handlers: IFunctionMap = CommandHandlers;
 
-    constructor(discordClient:any) {
+    constructor(discordClient: any) {
         this.discordClient = discordClient;
     }
 
-    handleRequest(chatInstance:any, result:any):Promise<string> {
+    handleRequest(chatInstance: any, result: any):Promise<string> {
         const action = result.action;
 
         return new Promise((resolve, reject) => {
